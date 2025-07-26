@@ -55,3 +55,4 @@ typing_extensions==4.13.1
 urllib3==2.4.0
 uvicorn==0.34.0
 exllamav2==0.3.2
+sentence-transformers==2.7.0

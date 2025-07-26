@@ -91,7 +91,7 @@ The backend loads local models based on a few environment variables. Adjust thes
 
 | Variable | Purpose | Default |
 | -------- | ------- | ------- |
-| `EMBED_PATH` | Name or path to a GGUF embedding model. | `nomic-embed-text:137m-v1.5-fp16` |
+| `EMBED_PATH` | Name or path to an embedding model (GGUF, `.pt` or HuggingFace ID). | `nomic-embed-text:137m-v1.5-fp16` |
 | `RERANK_PATH` | Path to a Qwen3 reranker `.safetensors` file. | `Qwen3-Reranker-8B-Q8_0.safetensors` |
 | `LLAMA_ARGS` | Extra flags passed to the Llama backend (dashes become underscores). | `""` |
 | `ENABLE_RERANK` | Enable the reranking stage with the model above. | `false` |
@@ -103,6 +103,12 @@ export EMBED_PATH=/path/to/Qwen3-Embed-Model.gguf
 export RERANK_PATH=/path/to/Qwen3-Reranker-8B-Q8_0.safetensors
 export ENABLE_RERANK=true
 export LLAMA_ARGS="--n-gpu-layers=1"
+```
+
+Example using a HuggingFace embedding model:
+
+```bash
+export EMBED_PATH=thenlper/gte-small
 ```
 
 Dashes in keys are converted to underscores, so the example above becomes `n_gpu_layers=1` when parsed.
