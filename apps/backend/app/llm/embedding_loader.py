@@ -30,9 +30,9 @@ def parse_llama_args(env: str | None = None) -> Dict[str, Any]:
     for token in shlex.split(raw):
         if "=" in token:
             key, val = token.split("=", 1)
-            args[key.lstrip("-")] = _convert_value(val)
+            args[key.lstrip("-").replace("-", "_")] = _convert_value(val)
         else:
-            args[token.lstrip("-")] = True
+            args[token.lstrip("-").replace("-", "_")] = True
     return args
 
 
