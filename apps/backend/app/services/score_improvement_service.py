@@ -4,6 +4,7 @@ import asyncio
 import logging
 import markdown
 import numpy as np
+import re
 
 from sqlalchemy.future import select
 from pydantic import ValidationError
@@ -338,8 +339,16 @@ class ScoreImprovementService:
             extracted_job_keywords_embedding=extracted_job_keywords_embedding,
         )
 
-        for i, suggestion in enumerate(updated_resume):
-            yield f"data: {json.dumps({'status': 'suggestion', 'index': i, 'text': suggestion})}\n\n"
+        segments = [
+            seg.strip()
+            for seg in re.split(r"\n+(?=\s*[-*\u2022]|\s*\d+\.)", updated_resume)
+            if seg.strip()
+        ]
+
+        for i, suggestion in enumerate(segments):
+            yield (
+                f"data: {json.dumps({'status': 'suggestion', 'index': i, 'text': suggestion})}\n\n"
+            )
             await asyncio.sleep(0.2)
 
         final_result = {
