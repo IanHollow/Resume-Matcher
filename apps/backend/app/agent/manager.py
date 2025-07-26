@@ -6,6 +6,7 @@ from .strategies.wrapper import JSONWrapper, MDWrapper
 from .providers.ollama import OllamaProvider, OllamaEmbeddingProvider
 from .providers.openai import OpenAIProvider, OpenAIEmbeddingProvider
 from .providers.gguf import GGUFEmbeddingProvider
+from .providers.hf import HFEmbeddingProvider
 
 
 class AgentManager:
@@ -57,6 +58,10 @@ class EmbeddingManager:
             if not os.path.isfile(model):
                 raise ProviderError(f"Embedding file '{model}' not found")
             return GGUFEmbeddingProvider(model)
+        if model.endswith(".pt") or "/" in model:
+            if model.endswith(".pt") and not os.path.isfile(model):
+                raise ProviderError(f"Embedding file '{model}' not found")
+            return HFEmbeddingProvider(model)
         installed_ollama_models = await OllamaProvider.get_installed_models()
         if model not in installed_ollama_models:
             raise ProviderError(
