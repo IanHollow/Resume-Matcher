@@ -37,7 +37,7 @@ Options:
 
 This script will:
   • Verify required tools: node, npm, python3, pip3, uv
-  • Install Ollama & pull gemma3:4b model
+  • Install Ollama & pull nomic-embed-text:137m-v1.5-fp16 model
   • Install root dependencies via npm ci
   • Bootstrap both root and backend .env files
   • Bootstrap backend venv and install Python deps via uv
