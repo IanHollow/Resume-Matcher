@@ -120,12 +120,18 @@ if ! command -v ollama &> /dev/null; then
   success "Ollama installed"
 fi
 
-if ! ollama list | grep -q 'gemma3:4b'; then
-  info "Pulling gemma3:4b model…"
-  ollama pull gemma3:4b || error "Failed to pull gemma3:4b"
-  success "gemma3:4b model ready"
+EMBED_MODEL="${EMBED_PATH:-gemma3:4b}"
+# Pull Ollama model if EMBED_MODEL looks like an Ollama model name
+if [[ "$EMBED_MODEL" != */* && "$EMBED_MODEL" != *.gguf ]]; then
+  if ! ollama list | grep -q "${EMBED_MODEL}"; then
+    info "Pulling ${EMBED_MODEL} model…"
+    ollama pull "${EMBED_MODEL}" || error "Failed to pull ${EMBED_MODEL}"
+    success "${EMBED_MODEL} model ready"
+  else
+    info "${EMBED_MODEL} model already present—skipping"
+  fi
 else
-  info "gemma3:4b model already present—skipping"
+  info "Using local embedding model path ${EMBED_MODEL}"
 fi
 
 #–– 3. Bootstrap root .env ––#

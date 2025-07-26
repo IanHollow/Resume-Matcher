@@ -4,6 +4,14 @@ WORKDIR /usr/src/app
 
 # ── install FastAPI stack
 ENV PIP_ROOT_USER_ACTION=ignore PIP_NO_CACHE_DIR=1
+ARG EMBED_PATH="nomic-embed-text:137m-v1.5-fp16"
+ARG RERANK_PATH="Qwen3-Reranker-8B-Q8_0.safetensors"
+ARG LLAMA_ARGS=""
+ARG ENABLE_RERANK=false
+ENV EMBED_PATH=${EMBED_PATH} \
+    RERANK_PATH=${RERANK_PATH} \
+    LLAMA_ARGS=${LLAMA_ARGS} \
+    ENABLE_RERANK=${ENABLE_RERANK}
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 

@@ -85,6 +85,26 @@ The project is built using:
 | Next.js      | 15+                   |
 | Ollama       |        0.6.7        |
 
+### Model Configuration
+
+The backend loads local models based on a few environment variables. Adjust these to point to custom models such as the Qwen3 series.
+
+| Variable | Purpose | Default |
+| -------- | ------- | ------- |
+| `EMBED_PATH` | Name or path to a GGUF embedding model. | `nomic-embed-text:137m-v1.5-fp16` |
+| `RERANK_PATH` | Path to a Qwen3 reranker `.safetensors` file. | `Qwen3-Reranker-8B-Q8_0.safetensors` |
+| `LLAMA_ARGS` | Extra flags passed to the Llama backend. | `""` |
+| `ENABLE_RERANK` | Enable the reranking stage with the model above. | `false` |
+
+Example pointing to the open Qwen3 models:
+
+```bash
+export EMBED_PATH=/path/to/Qwen3-Embed-Model.gguf
+export RERANK_PATH=/path/to/Qwen3-Reranker-8B-Q8_0.safetensors
+export ENABLE_RERANK=true
+export LLAMA_ARGS="--n-gpu-layers=1"
+```
+
 
 ## Join Us and Contribute
 
