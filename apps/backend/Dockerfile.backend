@@ -2,6 +2,15 @@
 FROM python:3.12-slim
 WORKDIR /usr/src/app
 
+# ── install build dependencies
+RUN echo 'Acquire::http::No-Cache "true";' > /etc/apt/apt.conf.d/99-no-cache && \
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/99-retries && \
+    echo "deb http://ftp.us.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+    echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb http://ftp.us.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list && \
+    apt-get update && apt-get install -y --fix-missing build-essential cmake gcc && \
+    rm -rf /var/lib/apt/lists/*
+
 # ── install FastAPI stack
 ENV PIP_ROOT_USER_ACTION=ignore PIP_NO_CACHE_DIR=1
 ARG EMBED_PATH="nomic-embed-text:137m-v1.5-fp16"
