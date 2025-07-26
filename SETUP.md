@@ -132,7 +132,7 @@ export LLAMA_ARGS="--n-gpu-layers=1"
  ollama serve
  ```
 
- If Ollama is not running, the script may fail to pull the required model (`gemma3:4b`).
+If Ollama is not running, the script may fail to pull the required model (`nomic-embed-text:137m-v1.5-fp16`).
  
 ### Windows Installation
 
@@ -153,7 +153,7 @@ export LLAMA_ARGS="--n-gpu-layers=1"
 
    - Verify/install prerequisites (`node`, `npm`, `python3`, `pip3`, `uv`)
    - Install Ollama via winget (if not present)
-   - Pull the `gemma3:4b` model via Ollama
+  - Pull the `nomic-embed-text:137m-v1.5-fp16` model via Ollama
    - Bootstrap root & backend `.env` files
    - Install Node.js deps (`npm ci`) at root and frontend
    - Sync Python deps in `apps/backend` via `uv sync`
@@ -195,7 +195,7 @@ export LLAMA_ARGS="--n-gpu-layers=1"
    This will:
 
    - Verify/install prerequisites (`node`, `npm`, `python3`, `pip3`, `uv`, `ollama`)
-   - Pull the `gemma3:4b` model via Ollama
+  - Pull the `nomic-embed-text:137m-v1.5-fp16` model via Ollama
    - Bootstrap root & backend `.env` files
    - Install Node.js deps (`npm ci`) at root and frontend
    - Sync Python deps in `apps/backend` via `uv sync`
