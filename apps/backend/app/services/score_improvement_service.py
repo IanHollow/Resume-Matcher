@@ -296,9 +296,14 @@ class ScoreImprovementService:
             )
         )
 
-        resume_embedding = await self.embedding_manager.embed(text=resume.content)
-        extracted_job_keywords_embedding = await self.embedding_manager.embed(
-            text=extracted_job_keywords
+        resume_embedding_task = asyncio.create_task(
+            self.embedding_manager.embed(resume.content)
+        )
+        job_kw_embedding_task = asyncio.create_task(
+            self.embedding_manager.embed(extracted_job_keywords)
+        )
+        resume_embedding, extracted_job_keywords_embedding = await asyncio.gather(
+            resume_embedding_task, job_kw_embedding_task
         )
 
         yield f"data: {json.dumps({'status': 'scoring', 'message': 'Calculating compatibility score...'})}\n\n"
