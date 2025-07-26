@@ -10,15 +10,15 @@ services:
       dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
-      environment:
-        <<: *ollama-env
-        SESSION_SECRET_KEY: "change-me"
-        SYNC_DATABASE_URL: "sqlite:///./data/app.db"
-        ASYNC_DATABASE_URL: "sqlite+aiosqlite:///./data/app.db"
-        EMBED_PATH: ${EMBED_PATH}
-        RERANK_PATH: ${RERANK_PATH}
-        LLAMA_ARGS: ${LLAMA_ARGS}
-        ENABLE_RERANK: ${ENABLE_RERANK}
+    environment:
+      <<: *ollama-env
+      SESSION_SECRET_KEY: "change-me"
+      SYNC_DATABASE_URL: "sqlite:///./data/app.db"
+      ASYNC_DATABASE_URL: "sqlite+aiosqlite:///./data/app.db"
+      EMBED_PATH: ${EMBED_PATH}
+      RERANK_PATH: ${RERANK_PATH}
+      LLAMA_ARGS: ${LLAMA_ARGS}
+      ENABLE_RERANK: ${ENABLE_RERANK}
     volumes:
       - ./apps/backend:/usr/src/app
       - sqlite-data:/usr/src/app/data
