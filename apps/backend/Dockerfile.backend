@@ -22,7 +22,8 @@ ENV EMBED_PATH=${EMBED_PATH} \
     LLAMA_ARGS=${LLAMA_ARGS} \
     ENABLE_RERANK=${ENABLE_RERANK}
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache \
+    pip install --upgrade pip && pip install -r requirements.txt
 
 # ── copy source
 COPY . .
