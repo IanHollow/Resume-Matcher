@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     SESSION_SECRET_KEY: Optional[str]
     DB_ECHO: bool = False
     PYTHONDONTWRITEBYTECODE: int = 1
+    RERANK_PATH: str = "Qwen3-Reranker-8B-Q8_0.safetensors"
+    ENABLE_RERANK: bool = False
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, ".env"),
