@@ -160,6 +160,11 @@ info "Setting up backend (apps/backend)…"
     info "Bootstrapping backend .env from .env.sample"
     cp .env.sample .env
     success "Backend .env created"
+    # Append model variables if exported
+    [[ -n "${EMBED_PATH:-}" ]] && printf '\nEMBED_PATH="%s"' "$EMBED_PATH" >> .env
+    [[ -n "${RERANK_PATH:-}" ]] && printf '\nRERANK_PATH="%s"' "$RERANK_PATH" >> .env
+    [[ -n "${LLAMA_ARGS:-}" ]] && printf '\nLLAMA_ARGS="%s"' "$LLAMA_ARGS" >> .env
+    [[ -n "${ENABLE_RERANK:-}" ]] && printf '\nENABLE_RERANK=%s' "$ENABLE_RERANK" >> .env
   else
     info "Backend .env exists or .env.sample missing—skipping"
   fi
