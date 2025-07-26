@@ -1,76 +1,47 @@
 version: "3.9"
 
+x-ollama-env: &ollama-env
+  OLLAMA_HOST: "http://host.docker.internal:11434"
+
 services:
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama-models:/root/.ollama
-    ports:
-      - "11434:11434"
-    restart: unless-stopped
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-
-  ollama-init:
-    image: ollama/ollama:latest
-    environment:
-      - OLLAMA_HOST=http://ollama:11434
-    entrypoint: ["sh", "-c"]
-    command: >
-      "
-        echo 'Waiting for Ollama to be ready...' &&
-        sleep 10 &&
-        echo 'Pulling gemma3:4b model...' &&
-        ollama pull gemma3:4b &&
-        echo 'Model pull completed' &&
-        echo 'Pulling nomic-embed-text:137m-v1.5-fp16 model...' &&
-        ollama pull nomic-embed-text:137m-v1.5-fp16 &&
-        echo 'Model pull completed'
-      "
-    depends_on:
-      ollama:
-        condition: service_started
-    volumes:
-      - ollama-models:/root/.ollama
-    restart: "no"
-
   backend:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile.backend
-    ports: ["8000:8000"]
+    ports:
+      - "8000:8000"
     environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - SESSION_SECRET_KEY=change-me
-      - SYNC_DATABASE_URL=sqlite:///./data/app.db
-      - ASYNC_DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+      <<: *ollama-env
+      SESSION_SECRET_KEY: "change-me"
+      SYNC_DATABASE_URL: "sqlite:///./data/app.db"
+      ASYNC_DATABASE_URL: "sqlite+aiosqlite:///./data/app.db"
     volumes:
       - ./apps/backend:/usr/src/app
       - sqlite-data:/usr/src/app/data
-    depends_on:
-      ollama:
-        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      retries: 5
+    mem_limit: 1g
     restart: unless-stopped
 
   frontend:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile.frontend
-    ports: ["3000:3000"]
+    ports:
+      - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
     volumes:
       - ./apps/frontend:/usr/src/app
       - node-modules:/usr/src/app/node_modules
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
+    mem_limit: 1g
     restart: unless-stopped
 
 volumes:
   sqlite-data:
-    driver: local
-  ollama-models:
-    driver: local
   node-modules:
-    driver: local
