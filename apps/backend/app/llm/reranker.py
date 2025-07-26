@@ -11,9 +11,10 @@ except Exception:  # pragma: no cover - optional dependency
     ExLlamaV2 = None  # type: ignore[misc]
 
 try:
-    from llama_cpp import Llama
+    from ctransformers import AutoModelForCausalLM, Config
 except Exception:  # pragma: no cover - optional dependency
-    Llama = None  # type: ignore[misc]
+    AutoModelForCausalLM = None  # type: ignore[misc]
+    Config = None  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
 
@@ -48,15 +49,21 @@ def rerank(
         except Exception as e:  # pragma: no cover - runtime error
             logger.error("exllamav2 rerank failed: %s", e)
 
-    if Llama is None:
-        raise RuntimeError("llama_cpp is not available")
+    if AutoModelForCausalLM is None or Config is None:
+        raise RuntimeError("ctransformers is not available")
 
-    llm = Llama(model_path=path, **kwargs)
+    if "n_gpu_layers" in kwargs:
+        kwargs["gpu_layers"] = kwargs.pop("n_gpu_layers")
+    if "n_threads" in kwargs:
+        kwargs["threads"] = kwargs.pop("n_threads")
+    if "n_ctx" in kwargs:
+        kwargs["context_length"] = kwargs.pop("n_ctx")
+
+    llm = AutoModelForCausalLM.from_pretrained(path, config=Config(**kwargs))
     scores = []
     for doc in docs:
         prompt = f"<query>{query}</query><doc>{doc}</doc>"
-        out = llm(prompt, max_tokens=1, temperature=0)
-        text = out.get("choices", [{}])[0].get("text", "").strip()
+        text = llm(prompt, max_new_tokens=1, temperature=0).strip()
         try:
             scores.append(float(text))
         except ValueError:

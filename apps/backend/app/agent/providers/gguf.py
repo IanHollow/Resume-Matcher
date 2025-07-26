@@ -12,14 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class GGUFEmbeddingProvider(EmbeddingProvider):
-    """Embedding provider for local GGUF models via llama-cpp."""
+    """Embedding provider for local GGUF models via ctransformers."""
 
     def __init__(self, model_path: str) -> None:
         if not os.path.isfile(model_path):
             raise ProviderError(f"GGUF model not found at {model_path}")
         # Parse LLAMA_ARGS; these flags allow device-specific tuning
         self._kwargs = parse_llama_args()
-        self._kwargs.setdefault("embedding", True)
         self._model = model_path
 
     async def embed(self, text: str) -> List[float]:

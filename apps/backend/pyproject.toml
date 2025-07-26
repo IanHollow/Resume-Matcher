@@ -38,7 +38,7 @@ dependencies = [
     "numpy==2.2.4",
     "ollama==0.4.7",
     "onnxruntime==1.21.1",
-    "llama-cpp-python==0.3.14",
+    "ctransformers==0.2.27",
     "openai==1.75.0",
     "packaging==25.0",
     "pdfminer.six==20250327",

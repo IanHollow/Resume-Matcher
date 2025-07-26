@@ -4,9 +4,10 @@ import shlex
 from typing import Any, Dict, List
 
 try:
-    from llama_cpp import Llama
-except Exception as e:  # pragma: no cover - fallback or missing dependency
-    Llama = None  # type: ignore[misc]
+    from ctransformers import AutoModelForCausalLM, Config
+except Exception:  # pragma: no cover - optional dependency
+    AutoModelForCausalLM = None  # type: ignore[misc]
+    Config = None  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +39,19 @@ def parse_llama_args(env: str | None = None) -> Dict[str, Any]:
 
 def get_embedding(text: str, model_path: str, llama_args: Dict[str, Any] | None = None) -> List[float]:
     """Return the embedding vector for *text* using a GGUF model."""
-    if Llama is None:
-        raise RuntimeError("llama_cpp is not available")
+    if AutoModelForCausalLM is None or Config is None:
+        raise RuntimeError("ctransformers is not available")
 
     kwargs = parse_llama_args() if llama_args is None else llama_args
-    kwargs.setdefault("embedding", True)
+    if "n_gpu_layers" in kwargs:
+        kwargs["gpu_layers"] = kwargs.pop("n_gpu_layers")
+    if "n_threads" in kwargs:
+        kwargs["threads"] = kwargs.pop("n_threads")
+    if "n_ctx" in kwargs:
+        kwargs["context_length"] = kwargs.pop("n_ctx")
+
     try:
-        llm = Llama(model_path=model_path, **kwargs)
+        llm = AutoModelForCausalLM.from_pretrained(model_path, config=Config(**kwargs))
         return llm.embed(text)
     except Exception as e:  # pragma: no cover - runtime error if model missing
         logger.error("embedding generation failed: %s", e)
