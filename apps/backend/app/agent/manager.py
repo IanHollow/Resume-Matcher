@@ -5,6 +5,7 @@ from .exceptions import ProviderError
 from .strategies.wrapper import JSONWrapper, MDWrapper
 from .providers.ollama import OllamaProvider, OllamaEmbeddingProvider
 from .providers.openai import OpenAIProvider, OpenAIEmbeddingProvider
+from .providers.gguf import GGUFEmbeddingProvider
 
 
 class AgentManager:
@@ -40,16 +41,22 @@ class AgentManager:
 
 
 class EmbeddingManager:
-    def __init__(self, model: str = "nomic-embed-text:137m-v1.5-fp16") -> None:
-        self._model = model
+    def __init__(self, model: str | None = None) -> None:
+        self._model = model or os.getenv(
+            "EMBED_PATH", "nomic-embed-text:137m-v1.5-fp16"
+        )
 
     async def _get_embedding_provider(
         self, **kwargs: Any
-    ) -> OllamaEmbeddingProvider | OpenAIEmbeddingProvider:
+    ) -> OllamaEmbeddingProvider | OpenAIEmbeddingProvider | GGUFEmbeddingProvider:
         api_key = kwargs.get("openai_api_key", os.getenv("OPENAI_API_KEY"))
         if api_key:
             return OpenAIEmbeddingProvider(api_key=api_key)
         model = kwargs.get("embedding_model", self._model)
+        if model.endswith(".gguf"):
+            if not os.path.isfile(model):
+                raise ProviderError(f"Embedding file '{model}' not found")
+            return GGUFEmbeddingProvider(model)
         installed_ollama_models = await OllamaProvider.get_installed_models()
         if model not in installed_ollama_models:
             raise ProviderError(
