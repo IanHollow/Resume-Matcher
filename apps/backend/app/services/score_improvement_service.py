@@ -312,6 +312,17 @@ class ScoreImprovementService:
         cosine_similarity_score = self.calculate_cosine_similarity(
             extracted_job_keywords_embedding, resume_embedding
         )
+        if self.reranker:
+            try:
+                rerank_score = self.reranker(
+                    extracted_job_keywords,
+                    [resume.content],
+                    model_path=settings.RERANK_PATH,
+                )[0]
+                if not np.isnan(rerank_score):
+                    cosine_similarity_score = rerank_score
+            except Exception as e:  # pragma: no cover - optional reranker
+                logger.error("reranker failed: %s", e)
 
         yield f"data: {json.dumps({'status': 'scored', 'score': cosine_similarity_score})}\n\n"
 
