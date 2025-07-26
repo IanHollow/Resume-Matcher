@@ -15,6 +15,8 @@ from app.schemas.json import json_schema_factory
 from app.schemas.pydantic import ResumePreviewerModel
 from app.agent import EmbeddingManager, AgentManager
 from app.models import Resume, Job, ProcessedResume, ProcessedJob
+from app.core import settings
+from app.llm import rerank
 from .exceptions import (
     ResumeNotFoundError,
     JobNotFoundError,
@@ -41,6 +43,9 @@ class ScoreImprovementService:
         self.md_agent_manager = AgentManager(strategy="md")
         self.json_agent_manager = AgentManager()
         self.embedding_manager = EmbeddingManager()
+        self.reranker = None
+        if settings.ENABLE_RERANK:
+            self.reranker = rerank
 
     def _validate_resume_keywords(
         self, processed_resume: ProcessedResume, resume_id: str
@@ -228,6 +233,17 @@ class ScoreImprovementService:
         cosine_similarity_score = self.calculate_cosine_similarity(
             extracted_job_keywords_embedding, resume_embedding
         )
+        if self.reranker:
+            try:
+                rerank_score = self.reranker(
+                    extracted_job_keywords,
+                    [resume.content],
+                    model_path=settings.RERANK_PATH,
+                )[0]
+                if not np.isnan(rerank_score):
+                    cosine_similarity_score = rerank_score
+            except Exception as e:  # pragma: no cover - optional reranker
+                logger.error("reranker failed: %s", e)
         updated_resume, updated_score = await self.improve_score_with_llm(
             resume=resume.content,
             extracted_resume_keywords=extracted_resume_keywords,
