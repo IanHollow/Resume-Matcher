@@ -4,6 +4,7 @@ from typing import List
 
 from fastapi.concurrency import run_in_threadpool
 from llama_cpp import Llama
+from app.llm.embedding_loader import parse_llama_args
 
 from .base import EmbeddingProvider
 from ..exceptions import ProviderError
@@ -17,8 +18,11 @@ class GGUFEmbeddingProvider(EmbeddingProvider):
     def __init__(self, model_path: str) -> None:
         if not os.path.isfile(model_path):
             raise ProviderError(f"GGUF model not found at {model_path}")
+        # Parse LLAMA_ARGS; these flags allow device-specific tuning
+        kwargs = parse_llama_args()
+        kwargs.setdefault("embedding", True)
         try:
-            self._llama = Llama(model_path=model_path, embedding=True)
+            self._llama = Llama(model_path=model_path, **kwargs)
         except Exception as e:  # pragma: no cover - runtime error if model missing
             logger.error(f"gguf load error: {e}")
             raise ProviderError(f"GGUF - Error loading model: {e}") from e
