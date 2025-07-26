@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     SESSION_SECRET_KEY: Optional[str]
     DB_ECHO: bool = False
     PYTHONDONTWRITEBYTECODE: int = 1
+    EMBED_PATH: str = "nomic-embed-text:137m-v1.5-fp16"
     RERANK_PATH: str = "Qwen3-Reranker-8B-Q8_0.safetensors"
+    LLAMA_ARGS: str = ""
     ENABLE_RERANK: bool = False
 
     model_config = SettingsConfigDict(
