@@ -19,11 +19,17 @@ Options:
 This Windows-only PowerShell script will:
   - Verify required tools: node, npm, python3, pip3, uv (CORE DEPENDENCIES)
   - Install Ollama via winget
-  - Pull gemma3:4b model
+  - Pull embedding model defined by EMBED_PATH (defaults to gemma3:4b)
   - Install root dependencies via npm
   - Bootstrap both root and backend .env files
   - Bootstrap backend venv and install Python deps via uv
   - Install frontend dependencies via npm
+
+Environment variables recognised:
+  - EMBED_PATH      Name or path to embedding model
+  - RERANK_PATH     Path to reranker model
+  - LLAMA_ARGS      Extra arguments passed to the Llama backend
+  - ENABLE_RERANK   Enable reranking when 'true'
 
 CORE DEPENDENCIES (script will fail if missing):
   - Node.js v18+
@@ -190,19 +196,26 @@ if (-not (Get-Command "ollama" -ErrorAction SilentlyContinue)) {
     Write-Success "Ollama is already installed"
 }
 
-# Pull Ollama model
+# Determine embed model
+$EmbedModel = if ($env:EMBED_PATH) { $env:EMBED_PATH } else { "gemma3:4b" }
+
+# Pull Ollama model if EmbedModel looks like a model name
 if (Get-Command "ollama" -ErrorAction SilentlyContinue) {
-    try {
-        $OllamaList = ollama list 2>&1
-        if ($OllamaList -notmatch "gemma3:4b") {
-            Write-Info "Pulling gemma3:4b model... (this may take a while)"
-            ollama pull gemma3:4b
-            Write-Success "gemma3:4b model ready"
-        } else {
-            Write-Info "gemma3:4b model already present—skipping"
+    if ($EmbedModel -notmatch '/' -and $EmbedModel -notmatch '\.gguf$') {
+        try {
+            $OllamaList = ollama list 2>&1
+            if ($OllamaList -notmatch [regex]::Escape($EmbedModel)) {
+                Write-Info "Pulling $EmbedModel model... (this may take a while)"
+                ollama pull $EmbedModel
+                Write-Success "$EmbedModel model ready"
+            } else {
+                Write-Info "$EmbedModel model already present—skipping"
+            }
+        } catch {
+            Write-Info "Warning: Failed to pull $EmbedModel model. You may need to install it manually later."
         }
-    } catch {
-        Write-Info "Warning: Failed to pull gemma3:4b model. You may need to install it manually later."
+    } else {
+        Write-Info "Using local embedding model path $EmbedModel"
     }
 }
 
@@ -239,6 +252,11 @@ if (Test-Path "apps/backend") {
             Write-Info "Bootstrapping backend .env from .env.sample"
             Copy-Item ".env.sample" ".env"
             Write-Success "Backend .env created"
+
+            if ($env:EMBED_PATH) { Add-Content ".env" "`nEMBED_PATH=\"$($env:EMBED_PATH)\"" }
+            if ($env:RERANK_PATH) { Add-Content ".env" "`nRERANK_PATH=\"$($env:RERANK_PATH)\"" }
+            if ($env:LLAMA_ARGS) { Add-Content ".env" "`nLLAMA_ARGS=\"$($env:LLAMA_ARGS)\"" }
+            if ($env:ENABLE_RERANK) { Add-Content ".env" "`nENABLE_RERANK=$($env:ENABLE_RERANK)" }
         } else {
             Write-Info "Backend .env exists or .env.sample missing—skipping"
         }
