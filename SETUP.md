@@ -105,7 +105,7 @@ You can customize any variables in these files before or after bootstrapping.
 | `NEXT_PUBLIC_API_URL`     | Frontend proxy to backend URI   | `http://localhost:8000`        |
 | `EMBED_PATH`              | Name or path to embedding model  | `nomic-embed-text:137m-v1.5-fp16` |
 | `RERANK_PATH`             | Path to Qwen3 reranker model     | `Qwen3-Reranker-8B-Q8_0.safetensors` |
-| `LLAMA_ARGS`              | Extra arguments for llama backend | `""` |
+| `LLAMA_ARGS`              | Extra arguments for llama backend (dashes become underscores). | `""` |
 | `ENABLE_RERANK`           | Enable reranking stage           | `false` |
 
 > **Note:** `PYTHONDONTWRITEBYTECODE=1` is exported by `setup.sh` to prevent `.pyc` files.
@@ -118,6 +118,8 @@ export RERANK_PATH=/path/to/Qwen3-Reranker-8B-Q8_0.safetensors
 export ENABLE_RERANK=true
 export LLAMA_ARGS="--n-gpu-layers=1"
 ```
+
+Dashes in keys are converted to underscores, so the example above becomes `n_gpu_layers=1` when parsed.
 
 ---
 
