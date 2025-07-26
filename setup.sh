@@ -120,7 +120,7 @@ if ! command -v ollama &> /dev/null; then
   success "Ollama installed"
 fi
 
-EMBED_MODEL="${EMBED_PATH:-gemma3:4b}"
+EMBED_MODEL="${EMBED_PATH:-nomic-embed-text:137m-v1.5-fp16}"
 # Pull Ollama model if EMBED_MODEL looks like an Ollama model name
 if [[ "$EMBED_MODEL" != */* && "$EMBED_MODEL" != *.gguf ]]; then
   if ! ollama list | grep -q "${EMBED_MODEL}"; then
