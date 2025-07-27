@@ -113,6 +113,11 @@ export EMBED_PATH=thenlper/gte-small
 
 Dashes in keys are converted to underscores, so the example above becomes `n_gpu_layers=1` when parsed.
 
+### Logging
+
+The backend uses **structlog** for JSON-formatted logs. Entries are written to
+`logs/backend.log` with rotation at 5&nbsp;MB and up to three files. Logging is
+initialised before the FastAPI app is created so startup messages are captured.
 
 ## Join Us and Contribute
 
