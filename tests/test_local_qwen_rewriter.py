@@ -8,18 +8,14 @@ import types
 ROOT = Path(__file__).resolve().parents[1]
 SERVICE_PATH = ROOT / "apps" / "backend" / "app" / "services" / "local_qwen_rewriter.py"
 sys.path.insert(0, str(ROOT / "apps" / "backend"))
+import fastapi  # ensure real FastAPI is available
 sys.modules.setdefault("ollama", types.ModuleType("ollama"))
-try:
-    import fastapi  # type: ignore
-except Exception:
-    fastapi_mod = types.ModuleType("fastapi")
-    fastapi_conc = types.ModuleType("fastapi.concurrency")
-    def run_in_threadpool(func, *args, **kwargs):
-        return func(*args, **kwargs)
-    fastapi_conc.run_in_threadpool = run_in_threadpool
-    fastapi_mod.concurrency = fastapi_conc
-    sys.modules.setdefault("fastapi", fastapi_mod)
-    sys.modules.setdefault("fastapi.concurrency", fastapi_conc)
+import fastapi
+
+def run_in_threadpool(func, *args, **kwargs):
+    return func(*args, **kwargs)
+
+fastapi.concurrency.run_in_threadpool = run_in_threadpool
 openai_mod = types.ModuleType("openai")
 openai_mod.OpenAI = object
 sys.modules.setdefault("openai", openai_mod)

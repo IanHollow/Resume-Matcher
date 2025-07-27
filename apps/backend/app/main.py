@@ -1,4 +1,3 @@
-from . import logging_config  # configure logging before the app is created
 import uvicorn
 from .base import create_app
 
