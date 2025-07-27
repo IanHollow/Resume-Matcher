@@ -8,6 +8,7 @@ import types
 ROOT = Path(__file__).resolve().parents[1]
 SERVICE_PATH = ROOT / "apps" / "backend" / "app" / "services" / "local_qwen_rewriter.py"
 sys.path.insert(0, str(ROOT / "apps" / "backend"))
+import fastapi  # ensure real FastAPI is available
 sys.modules.setdefault("ollama", types.ModuleType("ollama"))
 import fastapi
 
