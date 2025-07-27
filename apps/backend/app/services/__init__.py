@@ -1,6 +1,7 @@
 from .job_service import JobService
 from .resume_service import ResumeService
 from .score_improvement_service import ScoreImprovementService
+from .local_qwen_rewriter import LocalQwenRewriter
 from .exceptions import (
     ResumeNotFoundError,
     ResumeParsingError,
@@ -22,4 +23,5 @@ __all__ = [
     "ResumeKeywordExtractionError",
     "JobKeywordExtractionError",
     "ScoreImprovementService",
+    "LocalQwenRewriter",
 ]
