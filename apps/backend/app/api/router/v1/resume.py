@@ -243,7 +243,7 @@ async def score_and_improve(
 
 
 @resume_router.get(
-    "",
+    "/data",
     summary="Get resume data from both resume and processed_resume models",
 )
 async def get_resume(

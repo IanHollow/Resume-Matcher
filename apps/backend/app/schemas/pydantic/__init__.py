@@ -4,6 +4,7 @@ from .resume_preview import ResumePreviewerModel
 from .structured_resume import StructuredResumeModel
 from .resume_improvement import ResumeImprovementRequest
 from .resume_upload import ResumeUploadResponse
+from .resume_doc import ResumeDocModel, ResumeDocUpdate
 
 __all__ = [
     "JobUploadRequest",
@@ -12,4 +13,6 @@ __all__ = [
     "StructuredJobModel",
     "ResumeImprovementRequest",
     "ResumeUploadResponse",
+    "ResumeDocModel",
+    "ResumeDocUpdate",
 ]

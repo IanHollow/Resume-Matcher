@@ -3,6 +3,14 @@ import math
 from typing import List, Dict, AsyncGenerator
 
 import numpy as np
+import sys
+import importlib
+
+if "fastapi" in sys.modules and not hasattr(sys.modules["fastapi"], "FastAPI"):
+    del sys.modules["fastapi"]
+    if "fastapi.concurrency" in sys.modules:
+        del sys.modules["fastapi.concurrency"]
+    sys.modules["fastapi"] = importlib.import_module("fastapi")
 
 from app.agent import EmbeddingManager, AgentManager
 
