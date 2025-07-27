@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     RERANK_PATH: str = "Qwen3-Reranker-8B-Q8_0.safetensors"
     LLAMA_ARGS: str = ""
     ENABLE_RERANK: bool = False
+    PARSER_MODEL_PATH: str = "resume-parser.bin"
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, ".env"),

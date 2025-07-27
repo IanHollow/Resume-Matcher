@@ -1,9 +1,11 @@
 import logging
 import traceback
+from datetime import datetime, timedelta, timezone
 
 from uuid import uuid4
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, Response
 from fastapi import (
     APIRouter,
     File,
@@ -15,7 +17,7 @@ from fastapi import (
     Query,
 )
 
-from app.core import get_db_session
+from app.core import get_db_session, settings
 from app.services import (
     ResumeService,
     ScoreImprovementService,
@@ -27,7 +29,9 @@ from app.services import (
     ResumeKeywordExtractionError,
     JobKeywordExtractionError,
 )
-from app.schemas.pydantic import ResumeImprovementRequest
+from app.schemas.pydantic import ResumeImprovementRequest, ResumeUploadResponse
+from app.services.utils import file_sha256, model_sha256
+from db import ResumeDoc
 
 resume_router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -36,6 +40,19 @@ logger = logging.getLogger(__name__)
 @resume_router.post(
     "/upload",
     summary="Upload a resume in PDF or DOCX format and store it into DB in HTML/Markdown format",
+    response_model=ResumeUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        303: {
+            "description": "Resume already processed",
+            "headers": {
+                "Location": {
+                    "description": "URL to existing resume",
+                    "schema": {"type": "string"},
+                }
+            },
+        }
+    },
 )
 async def upload_resume(
     request: Request,
@@ -43,7 +60,9 @@ async def upload_resume(
     db: AsyncSession = Depends(get_db_session),
 ):
     """
-    Accepts a PDF or DOCX file, converts it to HTML/Markdown, and stores it in the database.
+    Accepts a PDF or DOCX file and converts it to Markdown. If the same file was
+    already parsed with the current model within the last 30 days, a ``303``
+    response is returned pointing to the existing resume.
 
     Raises:
         HTTPException: If the file type is not supported or if the file is empty.
@@ -66,6 +85,22 @@ async def upload_resume(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Empty file. Please upload a valid file.",
+        )
+
+    digest = file_sha256(file_bytes)
+    model_hash = model_sha256(settings.PARSER_MODEL_PATH)
+    thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    query = select(ResumeDoc).where(
+        ResumeDoc.hash == digest,
+        ResumeDoc.model_hash == model_hash,
+        ResumeDoc.upload_dt > thirty_days_ago,
+    )
+    result = await db.execute(query)
+    doc = result.scalars().first()
+    if doc:
+        return Response(
+            status_code=status.HTTP_303_SEE_OTHER,
+            headers={"Location": f"/api/v1/resumes/{doc.id}"},
         )
 
     try:
