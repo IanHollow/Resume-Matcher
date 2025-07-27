@@ -56,3 +56,4 @@ urllib3==2.4.0
 uvicorn==0.34.0
 exllamav2==0.3.2
 sentence-transformers==2.7.0
+structlog>=24.1
