@@ -17,7 +17,7 @@ services:
       ASYNC_DATABASE_URL: "sqlite+aiosqlite:///./data/app.db"
       EMBED_PATH: ${EMBED_PATH:-Qwen3-Embedding-8B.Q4_0.gguf}
       RERANK_PATH: ${RERANK_PATH:-Qwen3-Reranker-0.6B-Q8_0.safetensors}
-      ENABLE_RERANK: ${ENABLE_RERANK:-false}
+      ENABLE_RERANK: ${ENABLE_RERANK:-true}
     volumes:
       - ./apps/backend/.pipcache:/root/.cache/pip
       - ./apps/backend:/usr/src/app
