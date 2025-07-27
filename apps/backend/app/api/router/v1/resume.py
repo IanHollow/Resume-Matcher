@@ -111,6 +111,14 @@ async def upload_resume(
             filename=file.filename,
             content_type="md",
         )
+        doc = ResumeDoc(
+            hash=digest,
+            model_hash=model_hash,
+            filename=file.filename,
+            display_name=file.filename,
+        )
+        db.add(doc)
+        await db.flush()
     except ResumeValidationError as e:
         logger.warning(f"Resume validation failed: {str(e)}")
         raise HTTPException(
