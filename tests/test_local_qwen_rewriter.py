@@ -10,24 +10,22 @@ SERVICE_PATH = ROOT / "apps" / "backend" / "app" / "services" / "local_qwen_rewr
 sys.path.insert(0, str(ROOT / "apps" / "backend"))
 import fastapi  # ensure real FastAPI is available
 sys.modules.setdefault("ollama", types.ModuleType("ollama"))
-fastapi_mod = types.ModuleType("fastapi")
-fastapi_conc = types.ModuleType("fastapi.concurrency")
+import fastapi
+
 def run_in_threadpool(func, *args, **kwargs):
     return func(*args, **kwargs)
-fastapi_conc.run_in_threadpool = run_in_threadpool
-fastapi_mod.concurrency = fastapi_conc
-sys.modules.setdefault("fastapi", fastapi_mod)
-sys.modules.setdefault("fastapi.concurrency", fastapi_conc)
+
+fastapi.concurrency.run_in_threadpool = run_in_threadpool
 openai_mod = types.ModuleType("openai")
 openai_mod.OpenAI = object
 sys.modules.setdefault("openai", openai_mod)
 sys.modules.setdefault("sentence_transformers", types.ModuleType("sentence_transformers"))
 sys.modules["sentence_transformers"].SentenceTransformer = object
-llm_stub = types.ModuleType("app.llm")
-llm_stub.ensure_gguf = lambda *a, **k: None
-llm_stub.parse_llama_args = lambda *a, **k: {}
-llm_stub.get_embedding = lambda *a, **k: [0.0]
-sys.modules.setdefault("app.llm", llm_stub)
+llm_mod = types.ModuleType("app.llm")
+llm_mod.get_embedding = lambda *a, **k: [0.0, 0.0]
+llm_mod.parse_llama_args = lambda: {}
+llm_mod.ensure_gguf = lambda *a, **k: None
+sys.modules.setdefault("app.llm", llm_mod)
 
 spec = importlib.util.spec_from_file_location("local_qwen_rewriter", SERVICE_PATH)
 module = importlib.util.module_from_spec(spec)
