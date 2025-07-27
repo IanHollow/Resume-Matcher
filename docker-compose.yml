@@ -19,7 +19,7 @@ services:
       RERANK_PATH: ${RERANK_PATH:-Qwen3-Reranker-0.6B-Q8_0.safetensors}
       ENABLE_RERANK: ${ENABLE_RERANK:-false}
     volumes:
-      - pipcache:/root/.cache/pip
+      - ./apps/backend/.pipcache:/root/.cache/pip
       - ./apps/backend:/usr/src/app
       - sqlite-data:/usr/src/app/data
     healthcheck:
@@ -49,6 +49,3 @@ services:
 volumes:
   sqlite-data:
   node-modules:
-  pipcache:
-    driver_opts:
-      o: O
