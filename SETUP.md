@@ -103,8 +103,8 @@ You can customize any variables in these files before or after bootstrapping.
 | `PYTHONDONTWRITEBYTECODE` | Disable Python bytecode files   | `1`                            |
 | `ASYNC_DATABASE_URL`      | Backend async db connection URI | `sqlite+aiosqlite:///./app.db` |
 | `NEXT_PUBLIC_API_URL`     | Frontend proxy to backend URI   | `http://localhost:8000`        |
-| `EMBED_PATH`              | Name or path to an embedding model (GGUF, `.pt` or HuggingFace ID) | `nomic-embed-text:137m-v1.5-fp16` |
-| `RERANK_PATH`             | Path to Qwen3 reranker model     | `Qwen3-Reranker-8B-Q8_0.safetensors` |
+| `EMBED_PATH`              | Name or path to an embedding model (GGUF, `.pt` or HuggingFace ID) | `Qwen3-Embedding-8B.Q4_0.gguf` |
+| `RERANK_PATH`             | Path to Qwen3 reranker model     | `Qwen3-Reranker-0.6B-Q8_0.safetensors` |
 | `LLAMA_ARGS`              | Extra arguments for ctransformers backend (dashes become underscores). | `""` |
 | `ENABLE_RERANK`           | Enable reranking stage           | `false` |
 
@@ -113,8 +113,8 @@ You can customize any variables in these files before or after bootstrapping.
 To use the open Qwen3 models instead of the defaults you can export variables before running the setup script:
 
 ```bash
-export EMBED_PATH=/path/to/Qwen3-Embed-Model.gguf
-export RERANK_PATH=/path/to/Qwen3-Reranker-8B-Q8_0.safetensors
+export EMBED_PATH=/path/to/Qwen3-Embedding-8B.Q4_0.gguf
+export RERANK_PATH=/path/to/Qwen3-Reranker-0.6B-Q8_0.safetensors
 export ENABLE_RERANK=true
 export LLAMA_ARGS="--n-gpu-layers=1"
 ```
@@ -140,7 +140,7 @@ Dashes in keys are converted to underscores, so the example above becomes `n_gpu
  ollama serve
  ```
 
-If Ollama is not running, the script may fail to pull the required model (`nomic-embed-text:137m-v1.5-fp16`).
+If Ollama is not running, the script may fail to pull the required model (`Qwen3-Embedding-8B.Q4_0.gguf`).
  
 ### Windows Installation
 
@@ -161,7 +161,7 @@ If Ollama is not running, the script may fail to pull the required model (`nomic
 
    - Verify/install prerequisites (`node`, `npm`, `python3`, `pip3`, `uv`)
    - Install Ollama via winget (if not present)
-  - Pull the `nomic-embed-text:137m-v1.5-fp16` model via Ollama
+  - Pull the `Qwen3-Embedding-8B.Q4_0.gguf` model via Ollama
    - Bootstrap root & backend `.env` files
    - Install Node.js deps (`npm ci`) at root and frontend
    - Sync Python deps in `apps/backend` via `uv sync`
@@ -203,7 +203,7 @@ If Ollama is not running, the script may fail to pull the required model (`nomic
    This will:
 
    - Verify/install prerequisites (`node`, `npm`, `python3`, `pip3`, `uv`, `ollama`)
-  - Pull the `nomic-embed-text:137m-v1.5-fp16` model via Ollama
+  - Pull the `Qwen3-Embedding-8B.Q4_0.gguf` model via Ollama
    - Bootstrap root & backend `.env` files
    - Install Node.js deps (`npm ci`) at root and frontend
    - Sync Python deps in `apps/backend` via `uv sync`

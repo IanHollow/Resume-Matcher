@@ -44,7 +44,7 @@ class AgentManager:
 class EmbeddingManager:
     def __init__(self, model: str | None = None) -> None:
         self._model = model or os.getenv(
-            "EMBED_PATH", "nomic-embed-text:137m-v1.5-fp16"
+            "EMBED_PATH", "Qwen3-Embedding-8B.Q4_0.gguf"
         )
 
     async def _get_embedding_provider(
@@ -55,8 +55,6 @@ class EmbeddingManager:
             return OpenAIEmbeddingProvider(api_key=api_key)
         model = kwargs.get("embedding_model", self._model)
         if model.endswith(".gguf"):
-            if not os.path.isfile(model):
-                raise ProviderError(f"Embedding file '{model}' not found")
             return GGUFEmbeddingProvider(model)
         if model.endswith(".pt") or "/" in model:
             if model.endswith(".pt") and not os.path.isfile(model):

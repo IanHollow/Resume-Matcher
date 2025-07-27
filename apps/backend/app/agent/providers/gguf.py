@@ -1,9 +1,8 @@
 import logging
-import os
 from typing import List
 
 from fastapi.concurrency import run_in_threadpool
-from app.llm import get_embedding, parse_llama_args
+from app.llm import get_embedding, parse_llama_args, ensure_gguf
 
 from .base import EmbeddingProvider
 from ..exceptions import ProviderError
@@ -15,8 +14,7 @@ class GGUFEmbeddingProvider(EmbeddingProvider):
     """Embedding provider for local GGUF models via ctransformers."""
 
     def __init__(self, model_path: str) -> None:
-        if not os.path.isfile(model_path):
-            raise ProviderError(f"GGUF model not found at {model_path}")
+        ensure_gguf(model_path)
         # Parse LLAMA_ARGS; these flags allow device-specific tuning
         self._kwargs = parse_llama_args()
         self._model = model_path

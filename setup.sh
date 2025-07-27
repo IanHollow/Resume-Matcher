@@ -37,7 +37,7 @@ Options:
 
 This script will:
   • Verify required tools: node, npm, python3, pip3, uv
-  • Install Ollama & pull nomic-embed-text:137m-v1.5-fp16 model
+  • Install Ollama & pull Qwen3-Embedding-8B.Q4_0.gguf model
   • Install root dependencies via npm ci
   • Bootstrap both root and backend .env files
   • Bootstrap backend venv and install Python deps via uv
@@ -120,7 +120,7 @@ if ! command -v ollama &> /dev/null; then
   success "Ollama installed"
 fi
 
-EMBED_MODEL="${EMBED_PATH:-nomic-embed-text:137m-v1.5-fp16}"
+EMBED_MODEL="${EMBED_PATH:-Qwen3-Embedding-8B.Q4_0.gguf}"
 # Pull Ollama model if EMBED_MODEL looks like an Ollama model name
 if [[ "$EMBED_MODEL" != */* && "$EMBED_MODEL" != *.gguf ]]; then
   if ! ollama list | grep -q "${EMBED_MODEL}"; then

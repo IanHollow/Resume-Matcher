@@ -15,8 +15,8 @@ services:
       SESSION_SECRET_KEY: "change-me"
       SYNC_DATABASE_URL: "sqlite:///./data/app.db"
       ASYNC_DATABASE_URL: "sqlite+aiosqlite:///./data/app.db"
-      EMBED_PATH: ${EMBED_PATH:-nomic-embed-text:137m-v1.5-fp16}
-      RERANK_PATH: ${RERANK_PATH:-Qwen3-Reranker-8B-Q8_0.safetensors}
+      EMBED_PATH: ${EMBED_PATH:-Qwen3-Embedding-8B.Q4_0.gguf}
+      RERANK_PATH: ${RERANK_PATH:-Qwen3-Reranker-0.6B-Q8_0.safetensors}
       ENABLE_RERANK: ${ENABLE_RERANK:-false}
     volumes:
       - ./apps/backend:/usr/src/app
