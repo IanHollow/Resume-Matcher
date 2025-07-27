@@ -1,6 +1,9 @@
 import os
 import sys
 import logging
+from logging.handlers import RotatingFileHandler
+
+import structlog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List, Optional, Literal
 
@@ -28,6 +31,9 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+ENV = os.getenv("ENV", "dev").lower()
+
 
 _LEVEL_BY_ENV: dict[Literal["production", "staging", "local"], int] = {
     "production": logging.INFO,
@@ -49,19 +55,37 @@ def setup_logging() -> None:
     if root.handlers:
         return
 
-    env = settings.ENV.lower() if hasattr(settings, "ENV") else "production"
-    level = _LEVEL_BY_ENV.get(env, logging.INFO)
+    os.makedirs("logs", exist_ok=True)
+    log_file = os.path.join("logs", "backend.log")
 
-    formatter = logging.Formatter(
-        fmt="[%(asctime)s - %(name)s - %(levelname)s] %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z",
+    file_handler = RotatingFileHandler(
+        log_file, maxBytes=5 * 1024 * 1024, backupCount=3
+    )
+    console_handler = logging.StreamHandler(sys.stderr)
+
+    logging.basicConfig(
+        level=getattr(logging, LOG_LEVEL, logging.INFO),
+        format="%(message)s",
+        handlers=[file_handler, console_handler],
     )
 
-    handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(formatter)
+    renderer = (
+        structlog.processors.JSONRenderer()
+        if ENV == "prod"
+        else structlog.dev.ConsoleRenderer()
+    )
 
-    root.setLevel(level)
-    root.addHandler(handler)
+    structlog.configure(
+        processors=[
+            structlog.processors.TimeStamper(fmt="iso"),
+            renderer,
+        ],
+        wrapper_class=structlog.make_filtering_bound_logger(
+            getattr(logging, LOG_LEVEL, logging.INFO)
+        ),
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
 
     for noisy in ("sqlalchemy.engine", "uvicorn.access"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
