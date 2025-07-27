@@ -13,8 +13,8 @@ RUN echo 'Acquire::http::No-Cache "true";' > /etc/apt/apt.conf.d/99-no-cache && 
 
 # ── install FastAPI stack
 ENV PIP_ROOT_USER_ACTION=ignore PIP_NO_CACHE_DIR=1
-ARG EMBED_PATH="nomic-embed-text:137m-v1.5-fp16"
-ARG RERANK_PATH="Qwen3-Reranker-8B-Q8_0.safetensors"
+ARG EMBED_PATH="Qwen3-Embedding-8B.Q4_0.gguf"
+ARG RERANK_PATH="Qwen3-Reranker-0.6B-Q8_0.safetensors"
 ARG LLAMA_ARGS=""
 ARG ENABLE_RERANK=false
 ENV EMBED_PATH=${EMBED_PATH} \

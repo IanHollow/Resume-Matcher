@@ -1,6 +1,7 @@
 import os
 import logging
 import shlex
+import subprocess
 from typing import Any, Dict, List
 
 try:
@@ -10,6 +11,18 @@ except Exception:  # pragma: no cover - optional dependency
     Config = None  # type: ignore[misc]
 
 logger = logging.getLogger(__name__)
+
+
+def ensure_gguf(model_path: str) -> None:
+    """Ensure GGUF *model_path* exists, pulling via Ollama when missing."""
+    if os.path.isfile(model_path):
+        return
+    try:
+        subprocess.run(["ollama", "pull", model_path], check=True)
+    except Exception as exc:  # pragma: no cover - runtime error
+        logger.error("ollama pull failed: %s", exc)
+    if not os.path.isfile(model_path):
+        raise FileNotFoundError(model_path)
 
 
 def _convert_value(value: str) -> Any:
@@ -41,6 +54,8 @@ def get_embedding(text: str, model_path: str, llama_args: Dict[str, Any] | None 
     """Return the embedding vector for *text* using a GGUF model."""
     if AutoModelForCausalLM is None or Config is None:
         raise RuntimeError("ctransformers is not available")
+
+    ensure_gguf(model_path)
 
     kwargs = parse_llama_args() if llama_args is None else llama_args
     if "n_gpu_layers" in kwargs:

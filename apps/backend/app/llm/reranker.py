@@ -27,7 +27,7 @@ def rerank(
 ) -> List[float]:
     """Return relevance scores for *docs* in relation to *query*."""
 
-    path = model_path or os.getenv("RERANK_PATH", "Qwen3-Reranker-8B-Q8_0.safetensors")
+    path = model_path or os.getenv("RERANK_PATH", "Qwen3-Reranker-0.6B-Q8_0.safetensors")
     kwargs = parse_llama_args() if llama_args is None else llama_args
 
     # Prefer exllamav2 when available

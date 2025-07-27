@@ -19,7 +19,7 @@ Options:
 This Windows-only PowerShell script will:
   - Verify required tools: node, npm, python3, pip3, uv (CORE DEPENDENCIES)
   - Install Ollama via winget
-  - Pull embedding model defined by EMBED_PATH (defaults to nomic-embed-text:137m-v1.5-fp16)
+  - Pull embedding model defined by EMBED_PATH (defaults to Qwen3-Embedding-8B.Q4_0.gguf)
   - Install root dependencies via npm
   - Bootstrap both root and backend .env files
   - Bootstrap backend venv and install Python deps via uv
@@ -197,7 +197,7 @@ if (-not (Get-Command "ollama" -ErrorAction SilentlyContinue)) {
 }
 
 # Determine embed model
-$EmbedModel = if ($env:EMBED_PATH) { $env:EMBED_PATH } else { "nomic-embed-text:137m-v1.5-fp16" }
+$EmbedModel = if ($env:EMBED_PATH) { $env:EMBED_PATH } else { "Qwen3-Embedding-8B.Q4_0.gguf" }
 
 # Pull Ollama model if EmbedModel looks like a model name
 if (Get-Command "ollama" -ErrorAction SilentlyContinue) {

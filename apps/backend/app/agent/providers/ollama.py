@@ -55,7 +55,7 @@ class OllamaProvider(Provider):
 class OllamaEmbeddingProvider(EmbeddingProvider):
     def __init__(
         self,
-        embedding_model: str = "nomic-embed-text:137m-v1.5-fp16",
+        embedding_model: str = "Qwen3-Embedding-8B.Q4_0.gguf",
         host: Optional[str] = None,
     ):
         self._model = embedding_model
