@@ -22,9 +22,9 @@ sys.modules.setdefault("openai", openai_mod)
 sys.modules.setdefault("sentence_transformers", types.ModuleType("sentence_transformers"))
 sys.modules["sentence_transformers"].SentenceTransformer = object
 llm_mod = types.ModuleType("app.llm")
-llm_mod.get_embedding = lambda *a, **k: [0.0, 0.0]
-llm_mod.parse_llama_args = lambda: {}
 llm_mod.ensure_gguf = lambda *a, **k: None
+llm_mod.get_embedding = lambda *a, **k: []
+llm_mod.parse_llama_args = lambda *a, **k: {}
 sys.modules.setdefault("app.llm", llm_mod)
 
 spec = importlib.util.spec_from_file_location("local_qwen_rewriter", SERVICE_PATH)
