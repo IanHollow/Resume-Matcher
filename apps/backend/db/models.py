@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, LargeBinary, UniqueConstraint
 from sqlalchemy.types import JSON
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped, mapped_column
 
-from apps.backend.app.models.base import Base
+from app.models.base import Base
 
 
 class ResumeDoc(Base):
