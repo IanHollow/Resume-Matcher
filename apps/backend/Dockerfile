@@ -1,5 +1,6 @@
 # Backend Dockerfile
-FROM python:3.12-slim AS base
+FROM python:3.12-slim
+WORKDIR /usr/src/app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -7,6 +8,9 @@ ENV PYTHONUNBUFFERED=1
 ENV UV_CACHE_DIR=/tmp/uv-cache
 
 # Install system dependencies
+RUN echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99custom && \
+    echo "Acquire::http::No-Cache true;" >> /etc/apt/apt.conf.d/99custom && \
+    echo "Acquire::BrokenProxy    true;" >> /etc/apt/apt.conf.d/99custom
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -15,33 +19,14 @@ RUN apt-get update && apt-get install -y \
 # Install uv
 RUN pip install uv
 
-# Set working directory
-WORKDIR /app
-
 # Copy backend files
-COPY apps/backend/ .
+COPY . .
 
 # Install Python dependencies
 RUN uv sync
 
-# Development stage - stops here for dev compose
-FROM base AS development
-
-# Create .env file from sample if it doesn't exist
-RUN if [ ! -f .env ]; then cp .env.sample .env; fi
-
-# Production stage
-FROM base AS production
-
-# Create .env file from sample if it doesn't exist
-RUN if [ ! -f .env ]; then cp .env.sample .env; fi
-
 # Expose port
 EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
 
 # Start the application
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "300", "--timeout-graceful-shutdown", "300"]
