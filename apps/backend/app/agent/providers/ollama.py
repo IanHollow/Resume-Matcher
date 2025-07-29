@@ -48,6 +48,7 @@ class OllamaProvider(Provider):
                 prompt=prompt,
                 model=self.model,
                 options=options,
+                format="json",
             )
             return response["response"].strip()
         except Exception as e:
