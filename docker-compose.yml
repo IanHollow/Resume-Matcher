@@ -7,11 +7,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      OLLAMA_HOST: "http://host.docker.internal:11434"
+      OLLAMA_HOST: http://host.docker.internal:11434
       SESSION_SECRET_KEY: a-secret-key-for-production-change-this
       SYNC_DATABASE_URL: sqlite:///./data/app.db
       ASYNC_DATABASE_URL: sqlite+aiosqlite:///./data/app.db
-      PYTHONDONTWRITEBYTECODE: 1
+      LLM_PROVIDER: ollama
+      LL_MODEL: qwen3:8b
+      EMBEDDING_PROVIDER: ollama
+      EMBEDDING_MODEL: dengcao/Qwen3-Reranker-8B:Q5_K_M
     volumes:
       - sqlite-data:/usr/src/app/data
     restart: unless-stopped
